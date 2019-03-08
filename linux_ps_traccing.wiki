@@ -1,0 +1,80 @@
+= Linux Process Tracing =
+
+== Why ptrace ==
+    - *Userland means to access a process' address space*
+    - *attach to a process address space*
+        - access entire range of code
+        - data
+        - stack
+        - heap
+        - registers
+
+== What can be done using ptrace ==
+    - ptrace can be used to do some interesting stuffs
+        - Writing debuggers : *GDB, strace, ltrace are all ptrace assisted applications*
+        - memory virus infection
+        - virus analysis
+        - detection of userland root kit
+        - advanced debugging taks
+        - hotpatching
+        - reverse engineering
+
+== How to use ptrace ==
+
+`
+    #include <sys/ptrace.h>
+
+   long ptrace(enum __ptrace_request request, pid_t pid,
+                          void *addr, void *data);
+
+`   
+    - use it as a *libc* wrapper that takes *4 arguments*
+        - *request* : determines the action to be performed, some example are
+            - PTRACE_TRACEME - process is to be traced by its parents 
+            - PTRACE_PEEKUSER - read a word at offset in the tracee's USER area
+            - PTRACE_POKETEXT, PTRACE_POKEDATA - copy the word data to the address specified by addr in the tracees memory
+            - PTRACE_CONT - restart the stopped traceeprocess
+            - PTRACE_KILL - send tracee SIGKILL to terminate it
+            - PTRACE_ATTACH - attach to the process specified in *pid*
+        - *pid* : process id of process which is to be traced
+        - *addr* : has different meaning based on the request type
+        - *data* : dependent based on the request type
+
+== A debugger using ptrace ==
+    - A debugger allows us 
+        - to see what is going on *inside* a process
+        - stop and examine program state
+        - access and write data, stack, heap, registers
+        - examine what has happened to the program when it stopped/cored (*crashed*)
+    - Why write a debugger ?
+        - understand the internal of a process in execution
+        - Will help us progress further in our quest of understanding 
+            - *malware* (intentional)
+            - *bad code* (un-intentional)
+
+
+== strace using ptrace ==
+    - system call tracer
+    - *man strace*
+    - We will write strace to understand a running process
+
+== Types of Attacks ==
+
+| Infection Technique                                             | Intended Results                                | Residency Type                |
+|-----------------------------------------------------------------|-------------------------------------------------|-------------------------------|
+| GOT Infection                                                   | Hijacking shared library and functions          | Process Memory and executable |
+| PLT Infection                                                   | Hijacking shared library and functions          | Process Memory and executable |
+| .ctors/.dtors func ptr modification                             | Altering Control flow to Malicious code         | Process Memory and executable |
+| function trampolines                                            | Hijacking any function                          | Process Memory and executable |
+| Shared Library injection                                        | Inserting Malicious code                        | Process Memory and executable |
+| Relocatable code injection                                      | Inserting Malicious code                        | Process Memory and executable |
+| Direct modification to the text segment                         | Inserting Malicious code                        | Process Memory and executable |
+| Process Posession (injecting an entire program in address space | Running a different program hidden in a program | Process Memory                |
+
+== Using Ptrace to image reconstruction ==
+
+- TODO
+
+- *PLT* - Procedure Linkage Table
+- *GOT* - Global Offset Table
+-
