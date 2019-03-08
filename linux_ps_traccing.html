@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>linux_ps_traccing</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body>
+
+<div id="Linux Process Tracing"><h1 id="Linux Process Tracing" class="header"><a href="#Linux Process Tracing">Linux Process Tracing</a></h1></div>
+
+<div id="Linux Process Tracing-Why ptrace"><h2 id="Why ptrace" class="header"><a href="#Linux Process Tracing-Why ptrace">Why ptrace</a></h2></div>
+<ul>
+<li>
+<span id="Linux Process Tracing-Why ptrace-Userland means to access a process' address space"></span><strong id="Userland means to access a process' address space">Userland means to access a process' address space</strong>
+
+<li>
+<span id="Linux Process Tracing-Why ptrace-attach to a process address space"></span><strong id="attach to a process address space">attach to a process address space</strong>
+
+<ul>
+<li>
+access entire range of code
+
+<li>
+data
+
+<li>
+stack
+
+<li>
+heap
+
+<li>
+registers
+
+</ul>
+</ul>
+
+<div id="Linux Process Tracing-What can be done using ptrace"><h2 id="What can be done using ptrace" class="header"><a href="#Linux Process Tracing-What can be done using ptrace">What can be done using ptrace</a></h2></div>
+<ul>
+<li>
+ptrace can be used to do some interesting stuffs
+
+<ul>
+<li>
+Writing debuggers : <span id="Linux Process Tracing-What can be done using ptrace-GDB, strace, ltrace are all ptrace assisted applications"></span><strong id="GDB, strace, ltrace are all ptrace assisted applications">GDB, strace, ltrace are all ptrace assisted applications</strong>
+
+<li>
+memory virus infection
+
+<li>
+virus analysis
+
+<li>
+detection of userland root kit
+
+<li>
+advanced debugging taks
+
+<li>
+hotpatching
+
+<li>
+reverse engineering
+
+</ul>
+</ul>
+
+<div id="Linux Process Tracing-How to use ptrace"><h2 id="How to use ptrace" class="header"><a href="#Linux Process Tracing-How to use ptrace">How to use ptrace</a></h2></div>
+
+<p>
+`
+</p>
+<blockquote>
+#include &lt;sys/ptrace.h&gt;
+</blockquote>
+
+<p>
+   long ptrace(enum __ptrace_request request, pid_t pid,
+</p>
+<blockquote>
+void *addr, void *data);
+</blockquote>
+
+<p>
+`   
+</p>
+<ul>
+<li>
+use it as a <span id="Linux Process Tracing-How to use ptrace-libc"></span><strong id="libc">libc</strong> wrapper that takes <span id="Linux Process Tracing-How to use ptrace-4 arguments"></span><strong id="4 arguments">4 arguments</strong>
+
+<ul>
+<li>
+<span id="Linux Process Tracing-How to use ptrace-request"></span><strong id="request">request</strong> : determines the action to be performed, some example are
+
+<ul>
+<li>
+PTRACE_TRACEME - process is to be traced by its parents 
+
+<li>
+PTRACE_PEEKUSER - read a word at offset in the tracee's USER area
+
+<li>
+PTRACE_POKETEXT, PTRACE_POKEDATA - copy the word data to the address specified by addr in the tracees memory
+
+<li>
+PTRACE_CONT - restart the stopped traceeprocess
+
+<li>
+PTRACE_KILL - send tracee SIGKILL to terminate it
+
+<li>
+PTRACE_ATTACH - attach to the process specified in <span id="Linux Process Tracing-How to use ptrace-pid"></span><strong id="pid">pid</strong>
+
+</ul>
+<li>
+<span id="Linux Process Tracing-How to use ptrace-pid"></span><strong id="pid">pid</strong> : process id of process which is to be traced
+
+<li>
+<span id="Linux Process Tracing-How to use ptrace-addr"></span><strong id="addr">addr</strong> : has different meaning based on the request type
+
+<li>
+<span id="Linux Process Tracing-How to use ptrace-data"></span><strong id="data">data</strong> : dependent based on the request type
+
+</ul>
+</ul>
+
+<div id="Linux Process Tracing-A debugger using ptrace"><h2 id="A debugger using ptrace" class="header"><a href="#Linux Process Tracing-A debugger using ptrace">A debugger using ptrace</a></h2></div>
+<ul>
+<li>
+A debugger allows us 
+
+<ul>
+<li>
+to see what is going on <span id="Linux Process Tracing-A debugger using ptrace-inside"></span><strong id="inside">inside</strong> a process
+
+<li>
+stop and examine program state
+
+<li>
+access and write data, stack, heap, registers
+
+<li>
+examine what has happened to the program when it stopped/cored (<span id="Linux Process Tracing-A debugger using ptrace-crashed"></span><strong id="crashed">crashed</strong>)
+
+</ul>
+<li>
+Why write a debugger ?
+
+<ul>
+<li>
+understand the internal of a process in execution
+
+<li>
+Will help us progress further in our quest of understanding 
+
+<ul>
+<li>
+<span id="Linux Process Tracing-A debugger using ptrace-malware"></span><strong id="malware">malware</strong> (intentional)
+
+<li>
+<span id="Linux Process Tracing-A debugger using ptrace-bad code"></span><strong id="bad code">bad code</strong> (un-intentional)
+
+</ul>
+</ul>
+</ul>
+
+
+<div id="Linux Process Tracing-strace using ptrace"><h2 id="strace using ptrace" class="header"><a href="#Linux Process Tracing-strace using ptrace">strace using ptrace</a></h2></div>
+<ul>
+<li>
+system call tracer
+
+<li>
+<span id="Linux Process Tracing-strace using ptrace-man strace"></span><strong id="man strace">man strace</strong>
+
+<li>
+We will write strace to understand a running process
+
+</ul>
+
+<div id="Linux Process Tracing-Types of Attacks"><h2 id="Types of Attacks" class="header"><a href="#Linux Process Tracing-Types of Attacks">Types of Attacks</a></h2></div>
+
+<table>
+<tr>
+<th>
+Infection Technique
+</th>
+<th>
+Intended Results
+</th>
+<th>
+Residency Type
+</th>
+</tr>
+<tr>
+<td>
+GOT Infection
+</td>
+<td>
+Hijacking shared library and functions
+</td>
+<td>
+Process Memory and executable
+</td>
+</tr>
+<tr>
+<td>
+PLT Infection
+</td>
+<td>
+Hijacking shared library and functions
+</td>
+<td>
+Process Memory and executable
+</td>
+</tr>
+<tr>
+<td>
+.ctors/.dtors func ptr modification
+</td>
+<td>
+Altering Control flow to Malicious code
+</td>
+<td>
+Process Memory and executable
+</td>
+</tr>
+<tr>
+<td>
+function trampolines
+</td>
+<td>
+Hijacking any function
+</td>
+<td>
+Process Memory and executable
+</td>
+</tr>
+<tr>
+<td>
+Shared Library injection
+</td>
+<td>
+Inserting Malicious code
+</td>
+<td>
+Process Memory and executable
+</td>
+</tr>
+<tr>
+<td>
+Relocatable code injection
+</td>
+<td>
+Inserting Malicious code
+</td>
+<td>
+Process Memory and executable
+</td>
+</tr>
+<tr>
+<td>
+Direct modification to the text segment
+</td>
+<td>
+Inserting Malicious code
+</td>
+<td>
+Process Memory and executable
+</td>
+</tr>
+<tr>
+<td>
+Process Posession (injecting an entire program in address space
+</td>
+<td>
+Running a different program hidden in a program
+</td>
+<td>
+Process Memory
+</td>
+</tr>
+</table>
+
+<div id="Linux Process Tracing-Using Ptrace to image reconstruction"><h2 id="Using Ptrace to image reconstruction" class="header"><a href="#Linux Process Tracing-Using Ptrace to image reconstruction">Using Ptrace to image reconstruction</a></h2></div>
+
+<ul>
+<li>
+<span class="todo">TODO</span>
+
+</ul>
+
+<ul>
+<li>
+<span id="Linux Process Tracing-Using Ptrace to image reconstruction-PLT"></span><strong id="PLT">PLT</strong> - Procedure Linkage Table
+
+<li>
+<span id="Linux Process Tracing-Using Ptrace to image reconstruction-GOT"></span><strong id="GOT">GOT</strong> - Global Offset Table
+
+</ul>
+<p>
+-
+</p>
+
+</body>
+</html>
