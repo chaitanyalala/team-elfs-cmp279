@@ -30,6 +30,7 @@ READELFG=("readelf" "-g" $READELFOP)
 READELET=("readelf" "-t" $READELFOP)
 READELFE=("readelf" "-e" $READELFOP)
 READELFS=("readelf" "-s" $READELFOP)
+READELFSEC=("readelf" "-S" $READELFOP)
 READELFDYN=("readelf" "--dyn-syms" $READELFOP)
 READELFN=("readelf" "-n" $READELFOP)
 READELFR=("readelf" "-r" $READELFOP)
@@ -49,6 +50,7 @@ BINUTILARR=(
     READELET[@]
     READELFE[@]
     READELFS[@]
+    READELFSEC[@]
     READELFDYN[@]
     READELFN[@]
     READELFR[@]
